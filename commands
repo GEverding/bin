@@ -1,0 +1,21 @@
+#!/bin/bash
+
+FIFO=${1:-"/tmp/cmds"}
+
+#mkfifo $FIFO &> /dev/null
+if [[ ! -p $FIFO ]]; then
+    mkfifo $FIFO
+fi
+
+while true
+do
+  read cmd <$FIFO;
+  eval $cmd
+  if [ $? -eq 0 ]; then 
+    echo "== OK ==";
+    notify-send -t 1100 -i face-cool -a Commands "Success" "$cmd"
+  else
+    echo "!! ERR !!"; 
+    notify-send -t 1100 -i face-sad -a Commands 'Fail' "$cmd"; 
+  fi
+done
